@@ -1,5 +1,7 @@
 # node-shlex
 
+[![Build Status](https://travis-ci.org/rgov/node-shlex.svg?branch=master)](https://travis-ci.org/rgov/node-shlex)
+
 `node-shlex` is a Node.js module for quoting and parsing shell commands.
 
 The API was inspired by the [`shlex`][pyshlex] module from the Python Standard 
