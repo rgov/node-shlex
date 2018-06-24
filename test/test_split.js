@@ -72,7 +72,8 @@ describe('shlex.split()', function () {
     ['foo\\ bar', 'foo bar'],
     // ["foo#bar\nbaz", "foo", "baz"],  // FIXME: Comments are not implemented
     [':-) ;-)', ':-)', ';-)'],
-    ['\u00e1\u00e9\u00ed\u00f3\u00fa', '\u00e1\u00e9\u00ed\u00f3\u00fa']
+    ['\u00e1\u00e9\u00ed\u00f3\u00fa', '\u00e1\u00e9\u00ed\u00f3\u00fa'],
+    ['hello \\\n world', 'hello', 'world']
   ]
 
   it('should split according to POSIX rules', function () {

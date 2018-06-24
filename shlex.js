@@ -122,11 +122,14 @@ class Shlexer {
 
       // We were in an escape sequence, complete it
       if (escaped) {
-        // In a quote, we are only allowed to escape the quote character or
-        // another escape character
-        if (!in_quote || char === in_quote || this.escapes.includes(char)) {
+        if (char === '\n') {
+          // An escaped newline just means to continue the command on the next
+          // line. We just need to ignore it.
+        } else if (!in_quote || char === in_quote || this.escapes.includes(char)) {
           token = (token || '') + char
         } else {
+          // In a quote, we are only allowed to escape the quote character or
+          // another escape character
           token = (token || '') + escaped + char
         }
 
