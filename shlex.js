@@ -74,7 +74,7 @@ class Shlexer {
           // line. We just need to ignore it.
         } else if (!inQuote || char === inQuote || this.escapes.includes(char)) {
           token = (token || '') + char
-        } else { // Ignores newlines
+        } else {
           // In a quote, we are only allowed to escape the quote character or
           // another escape character
           token = (token || '') + escaped + char
