@@ -3,6 +3,7 @@
   "version": "1.0.2",
   "description": "Node.js port of Python's shlex shell-like lexer",
   "main": "shlex.js",
+  "types": "shlex.d.ts",
   "scripts": {
     "test": "mocha",
     "posttest": "eslint ."
