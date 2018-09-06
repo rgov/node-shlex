@@ -1,36 +1,34 @@
-/* global describe it */
+/* eslint-env mocha */
 'use strict'
 
-
-var assert = require('assert')
-
-var shlex = require('../shlex')
-
+const { assert } = require('chai')
+const shlex = require('../shlex')
 
 describe('shlex.quote()', function () {
-  var safe_unquoted = 'abcdefghijklmnopqrstuvwxyz' +
+  const safeUnquoted = 'abcdefghijklmnopqrstuvwxyz' +
                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
                        '0123456789' +
                        '@%_-+=:,./'
-  var unicode_sample = '\xe9\xe0\xdf' // e + acute accent, a + grave, sharp s
-  var unsafe = '"`$\\!' + unicode_sample
+  const unicodeSample = '\xe9\xe0\xdf' // e + acute accent, a + grave, sharp s
+  const unsafe = '"`$\\!' + unicodeSample
 
   it('should escape the empty string', function () {
     assert.equal(shlex.quote(''), '\'\'')
   })
 
   it('should not escape safe strings', function () {
-    assert.equal(shlex.quote(safe_unquoted), safe_unquoted)
+    assert.equal(shlex.quote(safeUnquoted), safeUnquoted)
   })
 
   it('should escape strings containing spaces', function () {
-    assert.equal(shlex.quote('test file name'), '\'test file name\'')
+    assert.equal(shlex.quote('test file name'), "'test file name'")
   })
 
   it('should escape unsafe characters', function () {
-    for (var i = 0; i < unsafe.length; i++) {
-      var input = 'test' + unsafe.charAt(i) + 'file'
-      var expected = '\'' + input + '\''
+    for (var char of unsafe) {
+      const input = 'test' + char + 'file'
+      const expected = '\'' + input + '\''
+
       assert.equal(shlex.quote(input), expected)
     }
   })

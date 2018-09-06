@@ -1,45 +1,14 @@
 'use strict'
 
 /*
-Port of a subset of the features of CPython's shlex module, which provides a
-shell-like lexer. Original code by Eric S. Raymond and other contributors.
+  Port of a subset of the features of CPython's shlex module, which provides a
+  shell-like lexer. Original code by Eric S. Raymond and other contributors.
 */
 
-var assert = require('assert')
-
-
 class Shlexer {
-  constructor (stream, posix = true, punctuation_chars = '') {
+  constructor (string) {
     this.i = 0
-    this.stream = stream
-
-    this.posix = posix
-    if (this.posix !== true) {
-      assert.fail('Only POSIX mode is implemented')
-    }
-
-    /**
-     * The string of characters that are recognized as comment beginners. All
-     * characters from the comment beginner to end of line are ignored.
-     */
-    this.commenters = ''
-    if (this.commenters !== '') {
-      assert.fail('Comments are not implemented yet')
-    }
-
-    /**
-     * The string of characters that will accumulate into multi-character
-     * tokens. By default, includes all ASCII alphanumerics and underscore. In
-     * POSIX mode, the accented characters in the Latin-1 set are also included.
-     */
-    this.wordchars = 'abcdfeghijklmnopqrstuvwxyz' +
-                     'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
-                     '0123456789' +
-                     '_'
-    if (this.posix) {
-      this.wordchars += 'ßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ' +
-                        'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞ'
-    }
+    this.string = string
 
     /**
      * Characters that will be considered whitespace and skipped. Whitespace
@@ -49,73 +18,51 @@ class Shlexer {
     this.whitespace = ' \t\r\n'
 
     /**
-     * If True, tokens will only be split in whitespaces.
-     */
-    this.whitespace_split = false
-    if (this.whitespace_split !== false) {
-      assert.fail('This whitespace splitting mode is not implemented yet')
-    }
-
-    /**
      * Characters that will be considered string quotes. The token accumulates
      * until the same quote is encountered again (thus, different quote types
      * protect each other as in the shell.) By default, includes ASCII single
      * and double quotes.
     */
-    this.quotes = '\'"'
+    this.quotes = `'"`
 
     /**
-     * Characters that will be considered as escape. This will be only used in
-     * POSIX mode, and includes just `\` by default.
+     * Characters that will be considered as escape. Just `\` by default.
      */
     this.escapes = '\\'
 
     /**
-     * The subset of quote types that allow escaped characters. This is only
-     * used in POSIX mode, and includes just `"` by default.
+     * The subset of quote types that allow escaped characters. Just `"` by default.
     */
-    this.escapedquotes = '"'
+    this.escapedQuotes = '"'
 
-    /**
-     * Characters that will be considered punctuation. Runs of punctuation
-     * characters will be returned as a single token. However, note that no
-     * semantic validity checking will be performed: for example, ‘>>>’ could
-     *  be returned as a token, even though it may not be recognised as such by
-     * shells.
-     */
-    this.punctuation_chars = punctuation_chars
-    if (this.punctuation_chars !== '') {
-      assert.fail('Punctuation characters are not implemented yet')
-    }
-
-    this.debug = 0
+    this.debug = false
   }
 
-  read_char () {
-    return this.stream.charAt(this.i++)
+  readChar () {
+    return this.string.charAt(this.i++)
   }
 
   * [Symbol.iterator] () {
-    var in_quote = false
-    var escaped = false
-    var token
+    let inQuote = false
+    let escaped = false
+    let token
 
     while (true) {
-      var char = this.read_char()
+      const char = this.readChar()
 
-      if (this.debug >= 3) {
+      if (this.debug) {
         console.log(
           'input:', '>' + char + '<',
           'accumulated:', token,
-          'in_quote:', in_quote,
+          'inQuote:', inQuote,
           'escaped:', escaped
         )
       }
 
       // Ran out of characters, we're done
       if (char === '') {
-        assert(!in_quote, 'Got EOF while in a quoted string')
-        assert(!escaped, 'Got EOF while in an escape sequence')
+        if (inQuote) { throw new Error('Got EOF while in a quoted string') }
+        if (escaped) { throw new Error('Got EOF while in an escape sequence') }
         if (token !== undefined) { yield token }
         return
       }
@@ -125,7 +72,7 @@ class Shlexer {
         if (char === '\n') {
           // An escaped newline just means to continue the command on the next
           // line. We just need to ignore it.
-        } else if (!in_quote || char === in_quote || this.escapes.includes(char)) {
+        } else if (!inQuote || char === inQuote || this.escapes.includes(char)) {
           token = (token || '') + char
         } else {
           // In a quote, we are only allowed to escape the quote character or
@@ -139,7 +86,7 @@ class Shlexer {
 
       // This is a new escape sequence
       if (this.escapes.includes(char)) {
-        if (in_quote && !this.escapedquotes.includes(in_quote)) {
+        if (inQuote && !this.escapedQuotes.includes(inQuote)) {
           // This string type doesn't use escaped characters. Ignore for now.
         } else {
           escaped = char
@@ -148,10 +95,10 @@ class Shlexer {
       }
 
       // We were in a string
-      if (in_quote !== false) {
+      if (inQuote !== false) {
         // String is finished. Don't grab the quote character.
-        if (char === in_quote) {
-          in_quote = false
+        if (char === inQuote) {
+          inQuote = false
           continue
         }
 
@@ -162,7 +109,7 @@ class Shlexer {
 
       // This is the start of a new string, don't accumulate the quotation mark
       if (this.quotes.includes(char)) {
-        in_quote = char
+        inQuote = char
         token = (token || '') // fixes blank string
         continue
       }
@@ -182,23 +129,26 @@ class Shlexer {
 
 
 /**
- * Split the string `s` using shell-like syntax.
+ * Splits a given string using shell-like syntax.
+ *
+ * @param {String} s String to split.
+ * @returns {String[]}
  */
 exports.split = function (s) {
-  var lex = new Shlexer(s)
-  lex.whitespace_split = true
-  return Array.from(lex)
+  return Array.from(new Shlexer(s))
 }
 
-
 /**
- * Return a shell-escaped version of the string `s`.
+ * Escapes a potentially shell-unsafe string using quotes.
+ *
+ * @param {String} s String to quote
+ * @returns {String}
  */
 exports.quote = function (s) {
   if (s === '') { return '\'\'' }
 
-  var unsafe_re = /[^\w@%\-+=:,./]/
-  if (!unsafe_re.test(s)) { return s }
+  var unsafeRe = /[^\w@%\-+=:,./]/
+  if (!unsafeRe.test(s)) { return s }
 
   return '\'' + s.replace(/'/g, '\'"\'"\'') + '\''
 }

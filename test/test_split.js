@@ -1,16 +1,13 @@
-/* global describe it */
+/* eslint-env mocha */
 'use strict'
 
-
-var assert = require('assert')
-
-var shlex = require('../shlex')
-
+const { assert } = require('chai')
+const shlex = require('../shlex')
 
 describe('shlex.split()', function () {
   // The original test data set was from shellwords, by Hartmut Goebel
 
-  var posix_testcases = [
+  const posixTestcases = [
     ['x', 'x'],
     ['foo bar', 'foo', 'bar'],
     [' foo bar', 'foo', 'bar'],
@@ -77,9 +74,10 @@ describe('shlex.split()', function () {
   ]
 
   it('should split according to POSIX rules', function () {
-    posix_testcases.forEach(function (test) {
-      var input = test[0]
-      var expected = test.slice(1)
+    posixTestcases.forEach(function (test) {
+      const input = test[0]
+      const expected = test.slice(1)
+
       assert.deepEqual(shlex.split(input), expected)
     })
   })
