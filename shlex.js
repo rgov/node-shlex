@@ -14,7 +14,7 @@ class Shlexer {
      * Characters that will be considered whitespace and skipped. Whitespace
      * bounds tokens. By default, includes space, tab, linefeed and carriage
      * return.
-    */
+     */
     this.whitespace = ' \t\r\n'
 
     /**
@@ -22,7 +22,7 @@ class Shlexer {
      * until the same quote is encountered again (thus, different quote types
      * protect each other as in the shell.) By default, includes ASCII single
      * and double quotes.
-    */
+     */
     this.quotes = `'"`
 
     /**
@@ -32,8 +32,23 @@ class Shlexer {
 
     /**
      * The subset of quote types that allow escaped characters. Just `"` by default.
-    */
+     */
     this.escapedQuotes = '"'
+
+    /**
+     * Whether to support ANSI C-style $'' quotes
+     * https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html
+     */
+    this.ansiCQuotes = true
+
+    /**
+     * Whether to support localized $"" quotes
+     * https://www.gnu.org/software/bash/manual/html_node/Locale-Translation.html
+     *
+     * The behavior is as if the current locale is set to C or POSIX, i.e., the
+     * contents are not translated.
+     */
+    this.localeQuotes = true
 
     this.debug = false
   }
@@ -42,19 +57,106 @@ class Shlexer {
     return this.string.charAt(this.i++)
   }
 
+  processEscapes (string, quote, isAnsiCQuote) {
+    if (!isAnsiCQuote && !this.escapedQuotes.includes(quote)) {
+      // This quote type doesn't support escape sequences
+      return string
+    }
+
+    // We need to form a regex that matches any of the escape characters,
+    // without interpreting any of the characters as a regex special character.
+    let anyEscape = '[' + this.escapes.replace(/(.)/g, '\\$1') + ']'
+
+    // Convenience function to define escape patterns
+    function ep (pattern) {
+      return new RegExp(anyEscape + '(' + pattern + ')', 'g')
+    }
+
+    // In regular quoted strings, we can only escape an escape character, and
+    // the quote character itself.
+    if (!isAnsiCQuote && this.escapedQuotes.includes(quote)) {
+      return string.replace(ep(anyEscape + '|\\' + quote), '$1')
+    }
+
+    // ANSI C quoted strings support a wide variety of escape sequences
+    if (isAnsiCQuote) {
+      // Literal characters
+      string = string.replace(ep('[\\\\\'"?]'), '$1')
+
+      // Non-printable ASCII characters
+      /* eslint-disable indent */
+      string = string.replace(ep('a'), '\x07')
+                     .replace(ep('b'), '\x08')
+                     .replace(ep('e|E'), '\x1b')
+                     .replace(ep('f'), '\x0c')
+                     .replace(ep('n'), '\x0a')
+                     .replace(ep('r'), '\x0d')
+                     .replace(ep('t'), '\x09')
+                     .replace(ep('v'), '\x0b')
+      /* eslint-enable indent */
+
+      // Octal bytes
+      string = string.replace(ep('[0-7]{1,3}'), function (m, p1) {
+        return String.fromCharCode(parseInt(p1, 8))
+      })
+
+      // Hexadecimal bytes
+      string = string.replace(ep('x([0-9a-fA-F]{1,2})'), function (m, p1, p2) {
+        return String.fromCharCode(parseInt(p2, 16))
+      })
+
+      // Unicode code unit
+      string = string.replace(ep('u([0-9a-fA-F]{1,4})'), function (m, p1, p2) {
+        return String.fromCharCode(parseInt(p2, 16))
+      })
+
+      // Longer Unicode code units
+      string = string.replace(ep('U([0-9a-fA-F]{1,8})'), function (m, p1, p2) {
+        return String.fromCharCode(parseInt(p2, 16))
+      })
+
+      // Control characters
+      // https://en.wikipedia.org/wiki/Control_character#How_control_characters_map_to_keyboards
+      string = string.replace(ep('c(.)'), function (m, p1, p2) {
+        if (p2 === '?') {
+          return '\x7f'
+        } else if (p2 === '@') {
+          return '\x00'
+        } else {
+          return String.fromCharCode(p2.charCodeAt(0) & 31)
+        }
+      })
+
+      return string
+    }
+
+    // Should not get here
+    return undefined
+  }
+
   * [Symbol.iterator] () {
     let inQuote = false
+    let inDollarQuote = false
     let escaped = false
+    let lastDollar = -2 // position of last dollar sign we saw
     let token
 
+    if (this.debug) {
+      console.log('full input:', '>' + this.string + '<')
+    }
+
     while (true) {
+      const pos = this.i
       const char = this.readChar()
 
       if (this.debug) {
         console.log(
+          'position:', pos,
           'input:', '>' + char + '<',
           'accumulated:', token,
           'inQuote:', inQuote,
+          'inDollarQuote:', inDollarQuote,
+          'lastDollar:', lastDollar,
           'escaped:', escaped
         )
       }
@@ -72,25 +174,27 @@ class Shlexer {
         if (char === '\n') {
           // An escaped newline just means to continue the command on the next
           // line. We just need to ignore it.
-        } else if (!inQuote || char === inQuote || this.escapes.includes(char)) {
-          token = (token || '') + char
-        } else {
-          // In a quote, we are only allowed to escape the quote character or
-          // another escape character
+        } else if (inQuote) {
+          // If we are in a quote, just accumulate the whole escape sequence,
+          // as we will interpret escape sequences later.
           token = (token || '') + escaped + char
+        } else {
+          // Just use the literal character
+          token = (token || '') + char
         }
 
         escaped = false
         continue
       }
 
-      // This is a new escape sequence
       if (this.escapes.includes(char)) {
-        if (inQuote && !this.escapedQuotes.includes(inQuote)) {
-          // This string type doesn't use escaped characters. Ignore for now.
-        } else {
+        if (!inQuote || inDollarQuote !== false || this.escapedQuotes.includes(inQuote)) {
+          // We encountered an escape character, which is going to affect how
+          // we treat the next character.
           escaped = char
           continue
+        } else {
+          // This string type doesn't use escape characters. Ignore for now.
         }
       }
 
@@ -98,7 +202,9 @@ class Shlexer {
       if (inQuote !== false) {
         // String is finished. Don't grab the quote character.
         if (char === inQuote) {
+          token = this.processEscapes(token, inQuote, inDollarQuote === '\'')
           inQuote = false
+          inDollarQuote = false
           continue
         }
 
@@ -110,8 +216,30 @@ class Shlexer {
       // This is the start of a new string, don't accumulate the quotation mark
       if (this.quotes.includes(char)) {
         inQuote = char
+        if (lastDollar === pos - 1) {
+          if (char === '\'' && !this.ansiCQuotes) {
+            // Feature not enabled
+          } else if (char === '"' && !this.localeQuotes) {
+            // Feature not enabled
+          } else {
+            inDollarQuote = char
+          }
+        }
+
         token = (token || '') // fixes blank string
+
+        if (inDollarQuote !== false) {
+          // Drop the opening $ we captured before
+          token = token.slice(0, -1)
+        }
+
         continue
+      }
+
+      // This is a dollar sign, record that we saw it in case it's the start of
+      // an ANSI C or localized string
+      if (inQuote === false && char === '$') {
+        lastDollar = pos
       }
 
       // This is whitespace, so yield the token if we have one

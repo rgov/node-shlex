@@ -67,14 +67,75 @@ describe('shlex.split()', function () {
     ["'foo\\ bar'", 'foo\\ bar'],
     ["'foo\\\\ bar'", 'foo\\\\ bar'],
     ['foo\\ bar', 'foo bar'],
-    // ["foo#bar\nbaz", "foo", "baz"],  // FIXME: Comments are not implemented
+    // ["foo#bar\nbaz", "foo", "baz"], // FIXME: Comments are not implemented
     [':-) ;-)', ':-)', ';-)'],
     ['\u00e1\u00e9\u00ed\u00f3\u00fa', '\u00e1\u00e9\u00ed\u00f3\u00fa'],
     ['hello \\\n world', 'hello', 'world']
   ]
 
+  const ansiCTestcases = [
+    ['$\'x\'', 'x'], // non-escaped character
+    ['$\'\\a\'', '\x07'], // alert (bell)
+    ['$\'\\b\'', '\x08'], // backspace
+    ['$\'\\e\'', '\x1b'], // escape character
+    ['$\'\\E\'', '\x1b'], // escape character
+    ['$\'\\f\'', '\x0c'], // form feed / new page
+    ['$\'\\n\'', '\x0a'], // newline
+    ['$\'\\r\'', '\x0d'], // carriage return
+    ['$\'\\t\'', '\x09'], // horizontal tab
+    ['$\'\\v\'', '\x0b'], // vertical tab
+    ['$\'\\\\\'', '\\'], // backslash
+    ['$\'\\\'\'', '\''], // single quote
+    ['$\'\\"\'', '"'], // double quote
+    ['$\'\\?\'', '?'], // question mark
+    ['$\'\\79\'', '\x07\x39'], // octal + non-octal
+    ['$\'\\07\'', '\x07'], // octal, zero prefix
+    ['$\'\\xfx\'', '\x0f\x78'], // hex (one digit) + non-hex
+    ['$\'\\xffx\'', '\xff\x78'], // hex (two digits) + non-hex
+    ['$\'\\xxx\'', '\\xxx'], // invalid hex
+    ['$\'\\u2603\'', '☃'], // unicode character
+    ['$\'\\U2603\'', '☃'], // unicode character
+    ['$\'\\ca\'', '\x01'], // control-a character
+    ['$\'\\cA\'', '\x01'], // control-A character, same as above
+    ['$\'\\c@\'', '\x00'], // control-@ character: null
+    ['$\'\\c?\'', '\x7f'], // control-? character: del
+    ['x$\'y\'z', 'xyz'],
+    ['"x"$\'y\'"z"', 'xyz'],
+    ['$\'x\'"y"$\'z\'', 'xyz'],
+    ['x"$\'y\'"z', 'x$\'y\'z']
+  ]
+
+  const localeTestcases = [
+    ['$"x"', 'x'], // non-escaped character
+    ['$"\\""', '"'], // escaped quotation mark
+    ['$"\\\\"', '\\'], // escaped escape character
+    ['$"\\x33"', '\\x33'], // other escape sequences do not work
+    ['x$"y"z', 'xyz'],
+    ['"x"$"y""z"', 'xyz'],
+    ['$"x""y"$"z"', 'xyz'],
+    ['x"$"y""z', 'x$yz']
+  ]
+
   it('should split according to POSIX rules', function () {
     posixTestcases.forEach(function (test) {
+      const input = test[0]
+      const expected = test.slice(1)
+
+      assert.deepEqual(shlex.split(input), expected)
+    })
+  })
+
+  it('should split ANSI C strings', function () {
+    ansiCTestcases.forEach(function (test) {
+      const input = test[0]
+      const expected = test.slice(1)
+
+      assert.deepEqual(shlex.split(input), expected)
+    })
+  })
+
+  it('should split localized strings', function () {
+    localeTestcases.forEach(function (test) {
       const input = test[0]
       const expected = test.slice(1)
 
