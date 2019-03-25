@@ -99,6 +99,7 @@ describe('shlex.split()', function () {
     ['$\'\\cA\'', '\x01'], // control-A character, same as above
     ['$\'\\c@\'', '\x00'], // control-@ character: null
     ['$\'\\c?\'', '\x7f'], // control-? character: del
+    ['$\'\\\\x30\'', '\\x30'],
     ['x$\'y\'z', 'xyz'],
     ['"x"$\'y\'"z"', 'xyz'],
     ['$\'x\'"y"$\'z\'', 'xyz'],

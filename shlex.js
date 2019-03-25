@@ -67,67 +67,69 @@ class Shlexer {
     // without interpreting any of the characters as a regex special character.
     let anyEscape = '[' + this.escapes.replace(/(.)/g, '\\$1') + ']'
 
-    // Convenience function to define escape patterns
-    function ep (pattern) {
-      return new RegExp(anyEscape + '(' + pattern + ')', 'g')
-    }
-
     // In regular quoted strings, we can only escape an escape character, and
     // the quote character itself.
     if (!isAnsiCQuote && this.escapedQuotes.includes(quote)) {
-      return string.replace(ep(anyEscape + '|\\' + quote), '$1')
+      let re = new RegExp(
+        anyEscape + '(' + anyEscape + '|\\' + quote + ')', 'g')
+      return string.replace(re, '$1')
     }
 
     // ANSI C quoted strings support a wide variety of escape sequences
     if (isAnsiCQuote) {
-      // Literal characters
-      string = string.replace(ep('[\\\\\'"?]'), '$1')
+      let patterns = {
+        // Literal characters
+        '([\\\\\'"?])': (x) => x,
 
-      // Non-printable ASCII characters
-      /* eslint-disable indent */
-      string = string.replace(ep('a'), '\x07')
-                     .replace(ep('b'), '\x08')
-                     .replace(ep('e|E'), '\x1b')
-                     .replace(ep('f'), '\x0c')
-                     .replace(ep('n'), '\x0a')
-                     .replace(ep('r'), '\x0d')
-                     .replace(ep('t'), '\x09')
-                     .replace(ep('v'), '\x0b')
-      /* eslint-enable indent */
+        // Non-printable ASCII characters
+        'a': () => '\x07',
+        'b': () => '\x08',
+        'e|E': () => '\x1b',
+        'f': () => '\x0c',
+        'n': () => '\x0a',
+        'r': () => '\x0d',
+        't': () => '\x09',
+        'v': () => '\x0b',
 
-      // Octal bytes
-      string = string.replace(ep('[0-7]{1,3}'), function (m, p1) {
-        return String.fromCharCode(parseInt(p1, 8))
-      })
+        // Octal bytes
+        '([0-7]{1,3})': (x) => String.fromCharCode(parseInt(x, 8)),
 
-      // Hexadecimal bytes
-      string = string.replace(ep('x([0-9a-fA-F]{1,2})'), function (m, p1, p2) {
-        return String.fromCharCode(parseInt(p2, 16))
-      })
+        // Hexadecimal bytes
+        'x([0-9a-fA-F]{1,2})': (x) => String.fromCharCode(parseInt(x, 16)),
 
-      // Unicode code unit
-      string = string.replace(ep('u([0-9a-fA-F]{1,4})'), function (m, p1, p2) {
-        return String.fromCharCode(parseInt(p2, 16))
-      })
+        // Unicode code units
+        'u([0-9a-fA-F]{1,4})': (x) => String.fromCharCode(parseInt(x, 16)),
+        'U([0-9a-fA-F]{1,8})': (x) => String.fromCharCode(parseInt(x, 16)),
 
-      // Longer Unicode code units
-      string = string.replace(ep('U([0-9a-fA-F]{1,8})'), function (m, p1, p2) {
-        return String.fromCharCode(parseInt(p2, 16))
-      })
+        // Control characters
+        // https://en.wikipedia.org/wiki/Control_character#How_control_characters_map_to_keyboards
+        'c(.)': (x) => {
+          if (x === '?') {
+            return '\x7f'
+          } else if (x === '@') {
+            return '\x00'
+          } else {
+            return String.fromCharCode(x.charCodeAt(0) & 31)
+          }
+        }
+      }
 
-      // Control characters
-      // https://en.wikipedia.org/wiki/Control_character#How_control_characters_map_to_keyboards
-      string = string.replace(ep('c(.)'), function (m, p1, p2) {
-        if (p2 === '?') {
-          return '\x7f'
-        } else if (p2 === '@') {
-          return '\x00'
-        } else {
-          return String.fromCharCode(p2.charCodeAt(0) & 31)
+      // Construct an uber-RegEx that catches all of the above pattern
+      let re = new RegExp(
+        anyEscape + '(' + Object.keys(patterns).join('|') + ')', 'g')
+
+      // For each match, figure out which subpattern matched, and apply the
+      // corresponding function
+      return string.replace(re, function (m, p1) {
+        for (let matched in patterns) {
+          let mm = new RegExp('^' + matched + '$').exec(p1)
+          if (mm === null) {
+            continue
+          }
+
+          return patterns[matched].apply(null, mm.slice(1))
         }
       })
-
-      return string
     }
 
     // Should not get here
