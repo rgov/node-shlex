@@ -262,10 +262,15 @@ class Shlexer {
  * Splits a given string using shell-like syntax.
  *
  * @param {String} s String to split.
+ * @param {Object} options Options to apply to the Shlexer
  * @returns {String[]}
  */
-exports.split = function (s) {
-  return Array.from(new Shlexer(s))
+exports.split = function (s, options) {
+  let shlex = new Shlexer(s)
+  for (let option in options) {
+    shlex[option] = options[option]
+  }
+  return Array.from(shlex)
 }
 
 /**
