@@ -4,7 +4,7 @@
 const { assert } = require('chai')
 const shlex = require('../shlex')
 
-describe('shlex.quote()', function () {
+describe('shlex.quote()', () => {
   const safeUnquoted = 'abcdefghijklmnopqrstuvwxyz' +
                        'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
                        '0123456789' +
@@ -12,20 +12,20 @@ describe('shlex.quote()', function () {
   const unicodeSample = '\xe9\xe0\xdf' // e + acute accent, a + grave, sharp s
   const unsafe = '"`$\\!' + unicodeSample
 
-  it('should escape the empty string', function () {
+  it('should escape the empty string', () => {
     assert.equal(shlex.quote(''), '\'\'')
   })
 
-  it('should not escape safe strings', function () {
+  it('should not escape safe strings', () => {
     assert.equal(shlex.quote(safeUnquoted), safeUnquoted)
   })
 
-  it('should escape strings containing spaces', function () {
+  it('should escape strings containing spaces', () => {
     assert.equal(shlex.quote('test file name'), "'test file name'")
   })
 
-  it('should escape unsafe characters', function () {
-    for (var char of unsafe) {
+  it('should escape unsafe characters', () => {
+    for (const char of unsafe) {
       const input = 'test' + char + 'file'
       const expected = '\'' + input + '\''
 
@@ -33,15 +33,15 @@ describe('shlex.quote()', function () {
     }
   })
 
-  it('should escape single quotes', function () {
+  it('should escape single quotes', () => {
     assert.equal(shlex.quote('test\'file'), '\'test\'"\'"\'file\'')
   })
 
-  it('should group escaped single quotes', function () {
+  it('should group escaped single quotes', () => {
     assert.equal(shlex.quote('test\'\'file'), '\'test\'"\'\'"\'file\'')
   })
 
-  it('should not include unnecessary quotes', function () {
+  it('should not include unnecessary quotes', () => {
     assert(!shlex.quote('"a').startsWith('\'\''))
     assert(!shlex.quote('a"').endsWith('\'\''))
   })

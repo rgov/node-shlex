@@ -1,3 +1,4 @@
+/* eslint-disable quotes, quote-props */
 'use strict'
 
 /*
@@ -65,19 +66,19 @@ class Shlexer {
 
     // We need to form a regex that matches any of the escape characters,
     // without interpreting any of the characters as a regex special character.
-    let anyEscape = '[' + this.escapes.replace(/(.)/g, '\\$1') + ']'
+    const anyEscape = '[' + this.escapes.replace(/(.)/g, '\\$1') + ']'
 
     // In regular quoted strings, we can only escape an escape character, and
     // the quote character itself.
     if (!isAnsiCQuote && this.escapedQuotes.includes(quote)) {
-      let re = new RegExp(
+      const re = new RegExp(
         anyEscape + '(' + anyEscape + '|\\' + quote + ')', 'g')
       return string.replace(re, '$1')
     }
 
     // ANSI C quoted strings support a wide variety of escape sequences
     if (isAnsiCQuote) {
-      let patterns = {
+      const patterns = {
         // Literal characters
         '([\\\\\'"?])': (x) => x,
 
@@ -115,14 +116,14 @@ class Shlexer {
       }
 
       // Construct an uber-RegEx that catches all of the above pattern
-      let re = new RegExp(
+      const re = new RegExp(
         anyEscape + '(' + Object.keys(patterns).join('|') + ')', 'g')
 
       // For each match, figure out which subpattern matched, and apply the
       // corresponding function
       return string.replace(re, function (m, p1) {
-        for (let matched in patterns) {
-          let mm = new RegExp('^' + matched + '$').exec(p1)
+        for (const matched in patterns) {
+          const mm = new RegExp('^' + matched + '$').exec(p1)
           if (mm === null) {
             continue
           }
@@ -277,7 +278,7 @@ exports.split = function (s) {
 exports.quote = function (s) {
   if (s === '') { return '\'\'' }
 
-  var unsafeRe = /[^\w@%\-+=:,./]/
+  const unsafeRe = /[^\w@%\-+=:,./]/
   if (!unsafeRe.test(s)) { return s }
 
   return ('\'' + s.replace(/('+)/g, '\'"$1"\'') + '\'').replace(/^''|''$/g, '')

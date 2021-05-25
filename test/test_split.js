@@ -4,7 +4,7 @@
 const { assert } = require('chai')
 const shlex = require('../shlex')
 
-describe('shlex.split()', function () {
+describe('shlex.split()', () => {
   // The original test data set was from shellwords, by Hartmut Goebel
 
   const posixTestcases = [
@@ -117,7 +117,7 @@ describe('shlex.split()', function () {
     ['x"$"y""z', 'x$yz']
   ]
 
-  it('should split according to POSIX rules', function () {
+  it('should split according to POSIX rules', () => {
     posixTestcases.forEach(function (test) {
       const input = test[0]
       const expected = test.slice(1)
@@ -126,7 +126,7 @@ describe('shlex.split()', function () {
     })
   })
 
-  it('should split ANSI C strings', function () {
+  it('should split ANSI C strings', () => {
     ansiCTestcases.forEach(function (test) {
       const input = test[0]
       const expected = test.slice(1)
@@ -135,7 +135,7 @@ describe('shlex.split()', function () {
     })
   })
 
-  it('should split localized strings', function () {
+  it('should split localized strings', () => {
     localeTestcases.forEach(function (test) {
       const input = test[0]
       const expected = test.slice(1)
