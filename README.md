@@ -19,8 +19,7 @@ diverges from the Python `shlex` behavior but makes parsing more accurate.
 [locale]: https://www.gnu.org/software/bash/manual/html_node/Locale-Translation.html
 
 Note that `node-shlex` does not attempt to split on or otherwise parse 
-operators (such as `2>/dev/null`), and it does not perform variable
-interpolation.
+operators (such as `2>/dev/null`) or comments, and it does not perform variable interpolation.
 
 ## Usage
 
