@@ -1,6 +1,6 @@
 {
   "name": "shlex",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Node.js port of Python's shlex shell-like lexer",
   "main": "shlex.js",
   "types": "shlex.d.ts",
@@ -24,7 +24,6 @@
     "url": "https://github.com/rgov/node-shlex/issues"
   },
   "homepage": "https://github.com/rgov/node-shlex#readme",
-  "dependencies": {},
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^5.15.3",

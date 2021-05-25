@@ -280,5 +280,5 @@ exports.quote = function (s) {
   var unsafeRe = /[^\w@%\-+=:,./]/
   if (!unsafeRe.test(s)) { return s }
 
-  return '\'' + s.replace(/'/g, '\'"\'"\'') + '\''
+  return ('\'' + s.replace(/('+)/g, '\'"$1"\'') + '\'').replace(/^''|''$/g, '')
 }

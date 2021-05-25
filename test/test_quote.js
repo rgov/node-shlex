@@ -36,4 +36,13 @@ describe('shlex.quote()', function () {
   it('should escape single quotes', function () {
     assert.equal(shlex.quote('test\'file'), '\'test\'"\'"\'file\'')
   })
+
+  it('should group escaped single quotes', function () {
+    assert.equal(shlex.quote('test\'\'file'), '\'test\'"\'\'"\'file\'')
+  })
+
+  it('should not include unnecessary quotes', function () {
+    assert(!shlex.quote('"a').startsWith('\'\''))
+    assert(!shlex.quote('a"').endsWith('\'\''))
+  })
 })
