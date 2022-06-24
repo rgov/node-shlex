@@ -260,7 +260,7 @@ class Shlexer {
 
 
 /**
- * Splits a given string using shell-like syntax.
+ * Splits a given string using shell-like syntax. This function is the inverse of shlex.join().
  *
  * @param {String} s String to split.
  * @returns {String[]}
@@ -282,4 +282,20 @@ exports.quote = function (s) {
   if (!unsafeRe.test(s)) { return s }
 
   return ('\'' + s.replace(/('+)/g, '\'"$1"\'') + '\'').replace(/^''|''$/g, '')
+}
+
+
+/**
+ * Concatenate the tokens of the list splitCommand and return a string. This function is the inverse of shlex.split().
+ *
+ * The returned value is shell-escaped to protect against injection vulnerabilities (see shlex.quote()).
+ *
+ * @param {String[]} s list of tokens to join
+ * @returns {String}
+*/
+exports.join = function(splitCommand) {
+  if (!Array.isArray(splitCommand)){
+      throw new TypeError("splitCommand should be array.")
+  }
+  return splitCommand.map(shlex.quote).join(" ")
 }

@@ -6,3 +6,4 @@ shlex.split('test text "multi word thing"')
 // Should error
 shlex.quote()
 shlex.split()
+shlex.join()
