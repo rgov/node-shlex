@@ -12,8 +12,7 @@ describe('shlex.join()', () => {
 
   it('should join according to POSIX rules', () => {
     posixTestcases.forEach(function (test) {
-      const input = test[0]
-      const expected = test(1)
+      const [input, expected] = test
 
       assert.deepEqual(shlex.join(input), expected)
     })

@@ -32,6 +32,14 @@ quote("abc def")  // returns: 'abc def'
 quote("can't")    // returns: 'can'"'"'t'
 ```
 
+### `shlex.join()`
+
+```node
+var join = require("shlex").join
+join(["ls", "-al", '/'])  // returns: 'ls -al /'
+join([ 'rm', '-f', '/Volumes/Macintosh HD' ])  // returns "rm -f '/Volumes/Macintosh HD'"
+```
+
 ### `shlex.split()`
 
 ```node
@@ -40,10 +48,4 @@ split('ls -al /')  // returns: [ 'ls', '-al', '/' ]
 split('rm -f "/Volumes/Macintosh HD"')  // returns [ 'rm', '-f', '/Volumes/Macintosh HD' ]
 ```
 
-### `shlex.join()`
 
-```node
-var join = require("shlex").join
-join(["ls", "-al", '/'])  // returns: 'ls -al /'
-join([ 'rm', '-f', '/Volumes/Macintosh HD' ])  // returns "rm -f '/Volumes/Macintosh HD'"
-```
