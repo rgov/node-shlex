@@ -287,18 +287,18 @@ exports.quote = function (s) {
 
 
 /**
- * Concatenate the tokens of the list args and return a string. This function 
+ * Concatenate the tokens of the list args and return a string. This function
  * is the inverse of shlex.split().
  *
- * The returned value is shell-escaped to protect against injection 
+ * The returned value is shell-escaped to protect against injection
  * vulnerabilities (see shlex.quote()).
  *
  * @param {String[]} args List of args to join
  * @returns {String}
 */
-exports.join = function(args) {
+exports.join = function (args) {
   if (!Array.isArray(args)) {
-      throw new TypeError("args should be an array")
+    throw new TypeError("args should be an array")
   }
   return args.map(exports.quote).join(" ")
 }
