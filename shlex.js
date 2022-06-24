@@ -261,7 +261,7 @@ class Shlexer {
 
 /**
  * Splits a given string using shell-like syntax. This function is the inverse
- *  of shlex.join().
+ * of shlex.join().
  *
  * @param {String} s String to split.
  * @returns {String[]}
