@@ -293,12 +293,12 @@ exports.quote = function (s) {
  * The returned value is shell-escaped to protect against injection 
  * vulnerabilities (see shlex.quote()).
  *
- * @param {String[]} s list of args to join
+ * @param {String[]} args List of args to join
  * @returns {String}
 */
 exports.join = function(args) {
-  if (!Array.isArray(args)){
-      throw new TypeError("args should be an array.")
+  if (!Array.isArray(args)) {
+      throw new TypeError("args should be an array")
   }
   return args.map(exports.quote).join(" ")
 }
