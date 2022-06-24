@@ -23,6 +23,14 @@ operators (such as `2>/dev/null`) or comments, and it does not perform variable 
 
 ## Usage
 
+### `shlex.join()`
+
+```node
+var join = require("shlex").join
+join(["ls", "-al", '/'])  // returns: 'ls -al /'
+join([ 'rm', '-f', '/Volumes/Macintosh HD' ])  // returns "rm -f '/Volumes/Macintosh HD'"
+```
+
 ### `shlex.quote()`
 
 ```node
@@ -32,14 +40,6 @@ quote("abc def")  // returns: 'abc def'
 quote("can't")    // returns: 'can'"'"'t'
 ```
 
-### `shlex.join()`
-
-```node
-var join = require("shlex").join
-join(["ls", "-al", '/'])  // returns: 'ls -al /'
-join([ 'rm', '-f', '/Volumes/Macintosh HD' ])  // returns "rm -f '/Volumes/Macintosh HD'"
-```
-
 ### `shlex.split()`
 
 ```node
@@ -47,5 +47,3 @@ var split = require("shlex").split
 split('ls -al /')  // returns: [ 'ls', '-al', '/' ]
 split('rm -f "/Volumes/Macintosh HD"')  // returns [ 'rm', '-f', '/Volumes/Macintosh HD' ]
 ```
-
-
