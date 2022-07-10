@@ -45,4 +45,8 @@ describe('shlex.quote()', () => {
     assert(!shlex.quote('"a').startsWith('\'\''))
     assert(!shlex.quote('a"').endsWith('\'\''))
   })
+
+  it('should catch undefined string', () => {
+    assert.deepEqual(shlex.quote(undefined), '')
+  })
 })

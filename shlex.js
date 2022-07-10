@@ -267,6 +267,7 @@ class Shlexer {
  * @returns {String[]}
  */
 exports.split = function (s) {
+  if (!s) { return [] }
   return Array.from(new Shlexer(s))
 }
 
@@ -277,6 +278,7 @@ exports.split = function (s) {
  * @returns {String}
  */
 exports.quote = function (s) {
+  if (s === undefined) { return '' }
   if (s === '') { return '\'\'' }
 
   const unsafeRe = /[^\w@%\-+=:,./]/
