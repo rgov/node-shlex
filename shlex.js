@@ -278,7 +278,7 @@ exports.split = function (s) {
  * @returns {String}
  */
 exports.quote = function (s) {
-  if (s === undefined) { return '' }
+  if (s === undefined || s === null) { return '' }
   if (s === '') { return '\'\'' }
 
   const unsafeRe = /[^\w@%\-+=:,./]/

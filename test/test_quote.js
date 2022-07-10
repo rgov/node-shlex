@@ -48,5 +48,7 @@ describe('shlex.quote()', () => {
 
   it('should catch undefined string', () => {
     assert.deepEqual(shlex.quote(undefined), '')
+    assert.deepEqual(shlex.quote(null), '')
+    assert.notDeepEqual(shlex.quote(''), '')
   })
 })

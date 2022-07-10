@@ -146,5 +146,7 @@ describe('shlex.split()', () => {
 
   it('should catch undefined string', () => {
     assert.deepEqual(shlex.split(undefined), [])
+    assert.deepEqual(shlex.split(null), [])
+    assert.deepEqual(shlex.split(''), [])
   })
 })
