@@ -2,6 +2,7 @@
   "name": "shlex",
   "version": "2.1.2",
   "description": "Node.js port of Python's shlex shell-like lexer",
+  "type": "module",
   "main": "shlex.js",
   "types": "shlex.d.ts",
   "scripts": {

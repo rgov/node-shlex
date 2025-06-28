@@ -1,8 +1,6 @@
 /* eslint-env mocha */
-'use strict'
-
-const { assert } = require('chai')
-const shlex = require('../shlex')
+import { assert } from 'chai'
+import * as shlex from '../shlex.js'
 
 describe('shlex.join()', () => {
   const posixTestcases = [
