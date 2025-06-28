@@ -27,16 +27,16 @@ operators (such as `2>/dev/null`) or comments, and it does not perform variable 
 
 ```node
 import { join } from 'shlex'
-join(["ls", "-al", '/'])  // returns: 'ls -al /'
-join([ 'rm', '-f', '/Volumes/Macintosh HD' ])  // returns: "rm -f '/Volumes/Macintosh HD'"
+join(['ls', '-al', '/'])  // returns: 'ls -al /'
+join(['rm', '-f', '/Volumes/Macintosh HD'])  // returns: "rm -f '/Volumes/Macintosh HD'"
 ```
 
 ### `shlex.quote()`
 
 ```node
 import { quote } from 'shlex'
-quote("abc")      // returns: abc
-quote("abc def")  // returns: 'abc def'
+quote('abc')      // returns: abc
+quote('abc def')  // returns: 'abc def'
 quote("can't")    // returns: 'can'"'"'t'
 ```
 
@@ -44,6 +44,6 @@ quote("can't")    // returns: 'can'"'"'t'
 
 ```node
 import { split } from 'shlex'
-split('ls -al /')  // returns: [ 'ls', '-al', '/' ]
-split('rm -f "/Volumes/Macintosh HD"')  // returns: [ 'rm', '-f', '/Volumes/Macintosh HD' ]
+split('ls -al /')  // returns: ['ls', '-al', '/']
+split('rm -f "/Volumes/Macintosh HD"')  // returns: ['rm', '-f', '/Volumes/Macintosh HD']
 ```
