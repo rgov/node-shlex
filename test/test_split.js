@@ -1,4 +1,3 @@
-/* eslint-env mocha */
 import { assert } from 'chai'
 import * as shlex from '../shlex.js'
 

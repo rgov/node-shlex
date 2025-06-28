@@ -1,4 +1,3 @@
-/* eslint-disable quotes, quote-props */
 'use strict'
 
 /*

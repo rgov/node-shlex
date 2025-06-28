@@ -2,7 +2,7 @@
 
 ![Build Status](https://github.com/rgov/node-shlex/workflows/Node.js%20CI/badge.svg)
 
-`node-shlex` is a Node.js module for quoting and parsing shell commands.
+`node-shlex` is a JavaScript module for quoting and parsing shell commands.
 
 The API was inspired by the [`shlex`][pyshlex] module from the Python Standard 
 Library. However, the Python implementation is fairly complex, and supports a
