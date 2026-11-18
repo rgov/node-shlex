@@ -92,7 +92,7 @@ class Shlexer {
         'v': () => '\x0b',
 
         // Octal bytes
-        '([0-7]{1,3})': (x) => String.fromCharCode(parseInt(x, 8)),
+        '([0-7]{1,3})': (x) => String.fromCharCode(parseInt(x, 8) & 0xff),
 
         // Hexadecimal bytes
         'x([0-9a-fA-F]{1,2})': (x) => String.fromCharCode(parseInt(x, 16)),

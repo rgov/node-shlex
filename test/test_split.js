@@ -91,6 +91,7 @@ describe('shlex.split()', () => {
     ['$\'\\?\'', '?'], // question mark
     ['$\'\\79\'', '\x07\x39'], // octal + non-octal
     ['$\'\\07\'', '\x07'], // octal, zero prefix
+    ['$\'\\777\'', '\xff'], // octal escape wraps to one byte
     ['$\'\\xfx\'', '\x0f\x78'], // hex (one digit) + non-hex
     ['$\'\\xffx\'', '\xff\x78'], // hex (two digits) + non-hex
     ['$\'\\x4E\'', 'N'], // hex escape ending in uppercase E
