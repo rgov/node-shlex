@@ -19,11 +19,5 @@ export default defineConfig([
       },
     },
   },
-  {
-    files: ['test/**/*.{js,ts}'],
-    languageOptions: {
-      globals: globals.mocha,
-    },
-  },
   tseslint.configs.recommended,
 ])
