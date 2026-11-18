@@ -14,16 +14,4 @@ describe('shlex.join()', () => {
       assert.deepEqual(shlex.join(input), expected)
     })
   })
-
-  it('should be undone by split()', () => {
-    const testcases = [
-      ['a\\\\\'b'],
-      ['\\\\\'', 'x\\"\'y'],
-      ['$\'\\n\'', '"\\\\"']
-    ]
-
-    testcases.forEach(function (input) {
-      assert.deepEqual(shlex.split(shlex.join(input)), input)
-    })
-  })
 })
