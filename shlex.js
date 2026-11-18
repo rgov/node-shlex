@@ -144,7 +144,7 @@ class Shlexer {
     let inQuote = false
     let inDollarQuote = false
     let escaped = false
-    let lastDollar = -2 // position of last dollar sign we saw
+    let afterDollar = false
     let quoteStart = 0 // where the current quoted string starts in the token
     let token
 
@@ -163,7 +163,7 @@ class Shlexer {
           'accumulated:', token,
           'inQuote:', inQuote,
           'inDollarQuote:', inDollarQuote,
-          'lastDollar:', lastDollar,
+          'afterDollar:', afterDollar,
           'escaped:', escaped
         )
       }
@@ -187,6 +187,7 @@ class Shlexer {
           token = (token || '') + escaped + char
         } else {
           // Just use the literal character
+          afterDollar = false
           token = (token || '') + char
         }
 
@@ -226,7 +227,8 @@ class Shlexer {
       // This is the start of a new string, don't accumulate the quotation mark
       if (this.quotes.includes(char)) {
         inQuote = char
-        if (lastDollar === pos - 1) {
+        if (afterDollar) {
+          afterDollar = false
           if (char === '\'' && !this.ansiCQuotes) {
             // Feature not enabled
           } else if (char === '"' && !this.localeQuotes) {
@@ -247,11 +249,8 @@ class Shlexer {
         continue
       }
 
-      // This is a dollar sign, record that we saw it in case it's the start of
-      // an ANSI C or localized string
-      if (inQuote === false && char === '$') {
-        lastDollar = pos
-      }
+      // An unescaped dollar sign can introduce an ANSI C or localized string
+      afterDollar = char === '$'
 
       // This is whitespace, so yield the token if we have one
       if (this.whitespace.includes(char)) {

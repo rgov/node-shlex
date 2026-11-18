@@ -76,6 +76,7 @@ describe('shlex.split()', () => {
 
   const ansiCTestcases = [
     ['$\'x\'', 'x'], // non-escaped character
+    ['$\\\n\'x\'', 'x'], // line continuation after $
     ['$\'\\a\'', '\x07'], // alert (bell)
     ['$\'\\b\'', '\x08'], // backspace
     ['$\'\\e\'', '\x1b'], // escape character
@@ -115,6 +116,7 @@ describe('shlex.split()', () => {
 
   const localeTestcases = [
     ['$"x"', 'x'], // non-escaped character
+    ['$\\\n"x"', 'x'], // line continuation after $
     ['$"\\""', '"'], // escaped quotation mark
     ['$"\\\\"', '\\'], // escaped escape character
     ['$"\\x33"', '\\x33'], // other escape sequences do not work
