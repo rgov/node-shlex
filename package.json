@@ -5,6 +5,10 @@
   "type": "module",
   "main": "shlex.js",
   "types": "shlex.d.ts",
+  "files": [
+    "shlex.js",
+    "shlex.d.ts"
+  ],
   "scripts": {
     "test": "node --test",
     "posttest": "eslint ."
