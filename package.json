@@ -1,6 +1,6 @@
 {
   "name": "shlex",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Node.js port of Python's shlex shell-like lexer",
   "type": "module",
   "main": "shlex.js",
