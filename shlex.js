@@ -84,7 +84,7 @@ class Shlexer {
         // Non-printable ASCII characters
         'a': () => '\x07',
         'b': () => '\x08',
-        'e|E': () => '\x1b',
+        '[eE]': () => '\x1b',
         'f': () => '\x0c',
         'n': () => '\x0a',
         'r': () => '\x0d',

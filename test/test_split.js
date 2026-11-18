@@ -93,6 +93,7 @@ describe('shlex.split()', () => {
     ['$\'\\07\'', '\x07'], // octal, zero prefix
     ['$\'\\xfx\'', '\x0f\x78'], // hex (one digit) + non-hex
     ['$\'\\xffx\'', '\xff\x78'], // hex (two digits) + non-hex
+    ['$\'\\x4E\'', 'N'], // hex escape ending in uppercase E
     ['$\'\\xxx\'', '\\xxx'], // invalid hex
     ['$\'\\u2603\'', '☃'], // unicode character
     ['$\'\\U2603\'', '☃'], // unicode character
