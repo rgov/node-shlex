@@ -67,7 +67,11 @@ describe('shlex.split()', () => {
     // ["foo#bar\nbaz", "foo", "baz"], // FIXME: Comments are not implemented
     [':-) ;-)', ':-)', ';-)'],
     ['\u00e1\u00e9\u00ed\u00f3\u00fa', '\u00e1\u00e9\u00ed\u00f3\u00fa'],
-    ['hello \\\n world', 'hello', 'world']
+    ['hello \\\n world', 'hello', 'world'],
+    // Escapes in a quoted string must not touch earlier parts of the word
+    ["'a\\\\'\"b\"", 'a\\\\b'],
+    ['\\\\\\\\"x"', '\\\\x'],
+    ["'x\\\\'\"\\\"\"", 'x\\\\"']
   ]
 
   const ansiCTestcases = [
@@ -100,7 +104,10 @@ describe('shlex.split()', () => {
     ['x$\'y\'z', 'xyz'],
     ['"x"$\'y\'"z"', 'xyz'],
     ['$\'x\'"y"$\'z\'', 'xyz'],
-    ['x"$\'y\'"z', 'x$\'y\'z']
+    ['x"$\'y\'"z', 'x$\'y\'z'],
+    ["'\\n'$'x'", '\\nx'], // single-quoted \n stays as is
+    ['"a\\\\\\\\"$\'b\'', 'a\\\\b'],
+    ['$\'\\\\\\\\\'"x"', '\\\\x']
   ]
 
   const localeTestcases = [
@@ -111,7 +118,8 @@ describe('shlex.split()', () => {
     ['x$"y"z', 'xyz'],
     ['"x"$"y""z"', 'xyz'],
     ['$"x""y"$"z"', 'xyz'],
-    ['x"$"y""z', 'x$yz']
+    ['x"$"y""z', 'x$yz'],
+    ["'\\\\'$\"x\"", '\\\\x']
   ]
 
   it('should split according to POSIX rules', () => {

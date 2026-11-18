@@ -141,6 +141,7 @@ class Shlexer {
     let inDollarQuote = false
     let escaped = false
     let lastDollar = -2 // position of last dollar sign we saw
+    let quoteStart = 0 // where the current quoted string starts in the token
     let token
 
     if (this.debug) {
@@ -204,7 +205,10 @@ class Shlexer {
       if (inQuote !== false) {
         // String is finished. Don't grab the quote character.
         if (char === inQuote) {
-          token = this.processEscapes(token, inQuote, inDollarQuote === '\'')
+          // Only interpret escapes inside this quoted string. The text before
+          // it in the same token has already been processed.
+          token = token.slice(0, quoteStart) + this.processEscapes(
+            token.slice(quoteStart), inQuote, inDollarQuote === '\'')
           inQuote = false
           inDollarQuote = false
           continue
@@ -235,6 +239,7 @@ class Shlexer {
           token = token.slice(0, -1)
         }
 
+        quoteStart = token.length
         continue
       }
 
