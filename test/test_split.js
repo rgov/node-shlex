@@ -97,6 +97,7 @@ describe('shlex.split()', () => {
     ['$\'\\xxx\'', '\\xxx'], // invalid hex
     ['$\'\\u2603\'', '☃'], // unicode character
     ['$\'\\U2603\'', '☃'], // unicode character
+    ['$\'\\U0001F600\'', '😀'], // Unicode code point above U+FFFF
     ['$\'\\ca\'', '\x01'], // control-a character
     ['$\'\\cA\'', '\x01'], // control-A character, same as above
     ['$\'\\c@\'', '\x00'], // control-@ character: null

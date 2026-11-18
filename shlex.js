@@ -97,9 +97,13 @@ class Shlexer {
         // Hexadecimal bytes
         'x([0-9a-fA-F]{1,2})': (x) => String.fromCharCode(parseInt(x, 16)),
 
-        // Unicode code units
+        // Unicode escapes
         'u([0-9a-fA-F]{1,4})': (x) => String.fromCharCode(parseInt(x, 16)),
-        'U([0-9a-fA-F]{1,8})': (x) => String.fromCharCode(parseInt(x, 16)),
+        'U([0-9a-fA-F]{1,8})': (x) => {
+          const codePoint = parseInt(x, 16)
+          if (codePoint > 0x10ffff) { return String.fromCharCode(codePoint) }
+          return String.fromCodePoint(codePoint)
+        },
 
         // Control characters
         // https://en.wikipedia.org/wiki/Control_character#How_control_characters_map_to_keyboards
