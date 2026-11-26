@@ -178,9 +178,9 @@ class Shlexer {
 
       // We were in an escape sequence, complete it
       if (escaped) {
-        if (char === '\n') {
+        if (char === '\n' && inDollarQuote !== '\'') {
           // An escaped newline just means to continue the command on the next
-          // line. We just need to ignore it.
+          // line. We just need to ignore it. ANSI C strings keep it as is.
         } else if (inQuote) {
           // If we are in a quote, just accumulate the whole escape sequence,
           // as we will interpret escape sequences later.
