@@ -105,6 +105,7 @@ describe('shlex.split()', () => {
     ['$\'\\cA\'', '\x01'], // control-A character, same as above
     ['$\'\\c@\'', '\x00'], // control-@ character: null
     ['$\'\\c?\'', '\x7f'], // control-? character: del
+    ['$\'a\\\nb\'', 'a\\\nb'], // backslash-newline is kept, not a line continuation
     ['$\'\\\\x30\'', '\\x30'],
     ['x$\'y\'z', 'xyz'],
     ['"x"$\'y\'"z"', 'xyz'],
